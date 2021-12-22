@@ -14,7 +14,7 @@ class Role(db.Model):
     __tablename__ = 'role'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32))
-
+    users = db.relationship('User', backref='users', lazy='dynamic')
     def __repr__(self):
         return '<Role {}'.format(self.position)
 
@@ -27,9 +27,8 @@ class User(UserMixin, db.Model):
     lastname = db.Column(db.String(64))
     email = db.Column(db.String(120), index=True)
     password_hash = db.Column(db.String(128))
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
-    role = db.relationship('Role', backref='user',  uselist=False)
-    questions = db.relationship('Questionary', backref='userquestion', lazy='dynamic')
+    role = db.Column(db.Integer, db.ForeignKey('role.id'))
+    questions = db.relationship('Questionary', backref='users', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -46,8 +45,27 @@ class Questionary(db.Model):
     __tablename__ = 'questionary'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
+    grade = db.Column(db.Numeric)
     user_id = db.Column(db.Integer, db.ForeignKey('useru.id'))
 
     def __repr__(self):
         return '<Questionary {}'.format(self.name)
+
+class Interview(db.Model):
+    __tablename__ = 'interview'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120))
+    candidate = db.Column(db.String(140))
+    user_id = db.Column(db.Integer, db.ForeignKey('useru.id'))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<Interview {}>'.format(self.name)
+
+class Result(db.Model):
+    __tablename__ = 'result'
+    id = db.Column(db.Integer, primary_key=True)
+    interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
+
+
 

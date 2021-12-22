@@ -3,15 +3,15 @@ from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
-from app.models import User
+from app.models import User, Role
 
 
 @app.route('/')
 @app.route('/index')
 @login_required  # this decorator save function from view anonymous user
 def index():
-    return render_template('index.html', title='Home')
 
+    return render_template('index.html', title='Home')
 
 # login function
 @app.route('/login', methods=['GET', 'POST'])
@@ -40,20 +40,26 @@ def logout():
 
 
 # register function
+@login_required
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
+    #if current_user.is_authenticated:
+     #   return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, firstname=form.firstname.data, lastname=form.lastname.data,
-                    email=form.email.data)
+                    email=form.email.data, role=form.role.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         flash('You are now a registered!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+#create interview function
+#@app.route('/interview', methods=['GET','POST'])
+#def create_interview():
+
 
 
 if __name__ == '__main__':
