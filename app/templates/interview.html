@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form action="" method="POST" class="col-md-4">
+    {{form.hidden_tag()}}
+    <p>
+        {{form.title.label}}<br>
+        {{form.title(size=32)}}<br>
+        {% for error in form.title.errors %}
+        <span style="color:red;">{{error}}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{form.date.label}}<br>
+        {{form.date(size=32)}}<br>
+        {% for error in form.date.errors %}
+        <span style="color:red;">{{error}}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{form.candidate.label}}<br>
+        {{form.candidate(size=32)}}<br>
+        {% for error in form.candidate.errors %}
+        <span style="color:red;">{{error}}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{form.user.label}}<br>
+        {{form.user}}<br>
+        {% for error in form.user.errors %}
+        <span style="color:red;">{{error}}</span>
+        {% endfor %}
+    </p>
+    <p>{{form.submit()}}</p>
+</form>
+{% endblock %}

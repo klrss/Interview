@@ -3,9 +3,29 @@
 {% block content %}
 <div class="container-fluid">
 
-<h3>Hello, {{current_user.firstname}}</h3>
-<a class="btn btn-primary" href="#" role="button">HR Manager</a>
-<a class="btn btn-primary" href="#" role="button">Expert</a>
-<a class="btn btn-primary" href="{{ url_for('register')}}" role="button">Admin</a>
+    <h3>Hi, {{current_user.firstname}} {{current_user.lastname}}</h3>
+    <!-- block of date importing from Moment.js -->
+    <hr>
+    <p></p>
+    <a class="btn btn-primary" href="{{ url_for('create_interview')}}" role="button">HR</a>
+    <a class="btn btn-primary" href="#" role="button">Expert</a>
+    <a class="btn btn-primary" href="{{ url_for('register')}}" role="button">Admin</a>
+    <!--block with interview -->
+    <ul>
+        {% for interview in interviews %}
+
+        <li>
+            <div>{{'Date of event: {}'.format(interview.date)}}</div>
+            <div>
+                {% for j in interview.users %}
+
+                {{ j }}
+
+                {% endfor %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
 </div>
 {% endblock %}

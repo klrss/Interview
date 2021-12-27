@@ -2,16 +2,18 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm
-from app.models import User, Role
+from app.forms import LoginForm, RegistrationForm, InterviewForm
+from app.models import User, Role, Interview
 
 
 @app.route('/')
 @app.route('/index')
 @login_required  # this decorator save function from view anonymous user
 def index():
+    interviews = Interview.query.order_by(Interview.date.desc()).all()
+    users = User.query.all()
 
-    return render_template('index.html', title='Home')
+    return render_template('index.html', title='Home', interviews=interviews, users=users)
 
 # login function
 @app.route('/login', methods=['GET', 'POST'])
@@ -57,9 +59,20 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 #create interview function
-#@app.route('/interview', methods=['GET','POST'])
-#def create_interview():
+@app.route('/event', methods=['GET','POST'])
+def create_interview():
+    form = InterviewForm()
+    if form.validate_on_submit():
+        interview = Interview(title = form.title.data, candidate = form.candidate.data, date=form.date.data,
+                              users=form.user.data)
+        db.session.add(interview)
+        db.session.commit()
+        flash('You have created the interview!')
+        return redirect(url_for('index'))
+    return render_template('interview.html', title='Interview',form=form)
 
+
+#def expert_page():
 
 
 if __name__ == '__main__':

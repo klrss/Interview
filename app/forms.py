@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
+from datetime import datetime
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeField
+from wtforms import SelectMultipleField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
-from app.models import User, Role
+from app.models import User, Role, Interview
 
 
 class LoginForm(FlaskForm):
@@ -24,9 +26,8 @@ class RegistrationForm(FlaskForm):
 
     def __init__(self, *args,**kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
-        self.role.choices = [(role.id,role.name)
+        self.role.choices = [(role.id, role.name)
                              for role in Role.query.order_by(Role.name).all()]
-
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
@@ -37,3 +38,16 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+
+class InterviewForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    candidate = StringField('Candidate', validators=[DataRequired()])
+    user = SelectMultipleField('User', coerce=int)
+    date = DateTimeField(format='%Y-%m-%d %H:%M',default=datetime.today())
+    submit = SubmitField('Create Interview')
+
+    def __init__(self, *args,**kwargs):
+        super(InterviewForm, self).__init__(*args, **kwargs)
+        self.user.choices = [(user.id,'{} {}'.format(user.firstname,user.lastname))
+                             for user in User.query.order_by(User.firstname).all()]
+
