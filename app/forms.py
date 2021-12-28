@@ -3,7 +3,7 @@ from datetime import datetime
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeField
 from wtforms import SelectMultipleField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
-from app.models import User, Role, Interview
+from app.models import User, Role, Interview, Category
 
 
 class LoginForm(FlaskForm):
@@ -51,3 +51,16 @@ class InterviewForm(FlaskForm):
         self.user.choices = [(user.id,'{} {}'.format(user.firstname,user.lastname))
                              for user in User.query.order_by(User.firstname).all()]
 
+class CategoryForm(FlaskForm):
+    name = StringField('Category', validators=[DataRequired()])
+    submit = SubmitField('Add a category')
+
+class QuestionForm(FlaskForm):
+    category = SelectMultipleField('Category',coerce=int)
+    name = StringField('Question',validators=[DataRequired()])
+    submit = SubmitField('Add a question')
+
+    def __init__(self, *args,**kwargs):
+        super(QuestionForm, self).__init__(*args, **kwargs)
+        self.category.choices = [(category.id,'{}'.format(category.name))
+                             for category in Category.query.order_by(Category.name).all()]

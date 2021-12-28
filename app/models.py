@@ -11,24 +11,26 @@ from sqlalchemy.dialects.postgresql import ARRAY
 def load_user(id):
     return User.query.get(int(id))
 
-
 class Role(db.Model):
     __tablename__ = 'role'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32))
     permission = db.Column(db.Integer)
-    users = db.relationship('User', backref='users', lazy='dynamic')
+    users = db.relationship('User', backref='users', lazy='joined')
+
+    def __init__(self,**kwargs):
+        super(Role, self).__init__(**kwargs)
+        if self.permission is None:
+            self.permission=0
 
     def __repr__(self):
         return '<Role {}'.format(self.position)
 
-
-# Mant to Many association table between two classes User and Interview
+# Many to Many association table between two classes User and Interview
 
 associations = db.Table('association',
                           db.Column('useru_id', db.ForeignKey('useru.id'), primary_key=True),
                           db.Column('interview_id', db.ForeignKey('interview.id'), primary_key=True))
-
 
 # create class user with mixin class, includes common implementations for user_login models
 class User(UserMixin, db.Model):
@@ -39,9 +41,9 @@ class User(UserMixin, db.Model):
     lastname = db.Column(db.String(64))
     email = db.Column(db.String(120), index=True)
     password_hash = db.Column(db.String(128))
-    role = db.Column(db.Integer, db.ForeignKey('role.id'))
-    questions = db.relationship('Questionary', backref='users_q', lazy='dynamic')
-    interviews = db.relationship('Interview',secondary=associations,backref=db.backref('interviewers', lazy='dynamic'))
+    role = db.Column(db.Integer, db.ForeignKey('role.id')) #foreignkey to role table
+    interviews = db.relationship('Interview',secondary=associations,
+                                 backref=db.backref('interviewers', lazy='joined'))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -65,17 +67,45 @@ class Interview(db.Model):
     def __repr__(self):
         return '<Interview {}>'.format(self.title)
 
+# Many to Many association table between Category and Question
+category_quest = db.Table('category_quest',
+                          db.Column('category_id', db.ForeignKey('category.id'),primary_key=True),
+                          db.Column('question_id', db.ForeignKey('questionary.id'),primary_key=True))
 
-# class questionary for user, one-to-many relationship
+#class category for question
+class Category(db.Model):
+    __tablename__='category'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140))
+    questions = db.relationship('Questionary',secondary='category_quest',
+                                backref=db.backref('type',lazy='joined'))
+# Many to Many association table between Questionary and Questset
+quest_set = db.Table('quest_set',
+                     db.Column('quest_id', db.ForeignKey('questionary.id'), primary_key=True),
+                     db.Column('set_id', db.ForeignKey('set.id'), primary_key=True))
+
+# class questionary
 class Questionary(db.Model):
     __tablename__ = 'questionary'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
-    maxgrade = db.Column(db.Numeric, default=10)
+    grade = db.Column(db.Numeric, default=10)
+    category = db.Column(ARRAY(db.Integer))
+    quests = db.relationship('Set', secondary='quest_set', backref=db.backref('sets', lazy='joined'))
+
+    def __repr__(self):
+        return '<Questionary {}>'.format(self.name)
+
+# created QuestSet by user, foreignkey to useru.id
+class Set(db.Model):
+    __tablename__='set'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(140))
+    names = db.Column(ARRAY(db.Integer))
     user = db.Column(db.Integer, db.ForeignKey('useru.id'))
 
     def __repr__(self):
-        return '<Questionary {}'.format(self.name)
+        return '<Set {}>'.format(self.title)
 
 
 class Result(db.Model):
