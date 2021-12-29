@@ -3,27 +3,18 @@
 {% block content %}
 <a href="{{ url_for('foradmin') }}">Back</a>
 <a href="{{ url_for('register') }}">To add user</a>
-<a href="{{ url_for('add_category') }}">To add category</a>
-<h3>Question</h3>
+<a href="{{ url_for('quest') }}">To add question</a>
+<h3>Category</h3>
 <form action="" method="post" class="col-md-4">
     {{form.hidden_tag()}}
     <p>
-        {{form.category.label}}<br>
-        {{form.category}}<br>
-        {% for error in form.category.errors %}
-        <span style="color:red;">{{error}}</span>
-        {% endfor %}
-    </p>
-<p>
         {{form.name.label}}<br>
         {{form.name(size=32)}}<br>
         {% for error in form.name.errors %}
         <span style="color:red;">{{error}}</span>
         {% endfor %}
     </p>
-    <p>
-        {{form.submit()}}
-    </p>
+    <p>{{form.submit()}}</p>
 </form>
 <!--<a calss="btn btn-primary" href="{{ url_for('foradmin') }}" role="button">Completed</a>-->
 {% endblock %}

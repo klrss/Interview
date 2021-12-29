@@ -48,19 +48,19 @@ class InterviewForm(FlaskForm):
 
     def __init__(self, *args,**kwargs):
         super(InterviewForm, self).__init__(*args, **kwargs)
-        self.user.choices = [(user.id,'{} {}'.format(user.firstname,user.lastname))
+        self.user.choices = [(user.id,'{} {}'.format(user.firstname, user.lastname))
                              for user in User.query.order_by(User.firstname).all()]
 
 class CategoryForm(FlaskForm):
-    name = StringField('Category', validators=[DataRequired()])
+    name = StringField('Title', validators=[DataRequired()])
     submit = SubmitField('Add a category')
 
 class QuestionForm(FlaskForm):
-    category = SelectMultipleField('Category',coerce=int)
+    category = SelectMultipleField('Category', coerce=int)
     name = StringField('Question',validators=[DataRequired()])
     submit = SubmitField('Add a question')
 
     def __init__(self, *args,**kwargs):
         super(QuestionForm, self).__init__(*args, **kwargs)
-        self.category.choices = [(category.id,'{}'.format(category.name))
+        self.category.choices = [(category.id, category.name)
                              for category in Category.query.order_by(Category.name).all()]

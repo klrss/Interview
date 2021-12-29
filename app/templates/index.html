@@ -2,11 +2,9 @@
 
 {% block content %}
 <div class="container-fluid">
-
     <h3>Hi, {{current_user.firstname}} {{current_user.lastname}}</h3>
     <!-- block of date importing from Moment.js -->
     <hr>
-
     <p>{{ moment(current_time).format('LLL') }}</p>
     <a class="btn btn-primary" href="{{ url_for('create_interview') }}" role="button">HR</a>
     <a class="btn btn-primary" href="#" role="button">Expert</a>
@@ -14,7 +12,6 @@
     <!--block with interview -->
     <ul>
         {% for interview in interviews %}
-
         <li>
             <div>{{'Date of interview: {}'.format(interview.date)}}</div>
             <div>
@@ -22,12 +19,10 @@
                 {% if j.id in interview.users %}
                 {{ '{}'.format(j.firstname) }}
                 {% endif %}
-
                 {% endfor %}
             </div>
         </li>
         {% endfor %}
     </ul>
-
 </div>
 {% endblock %}

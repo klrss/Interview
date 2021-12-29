@@ -90,22 +90,28 @@ def create_interview():
 #    interviews=Interview.query.filter_by()
 #    return render_template('expertpage.html', user=user)
 
-# Questionaryome
-@app.route('/quest',methods=['POST','GET'])
+@app.route('/category', methods=['POST', 'GET'])
+@login_required
+def add_category():
+    form = CategoryForm()
+    if form.validate_on_submit():
+        cat = Category(name=form.name.data)
+        db.session.add(cat)
+        db.session.commit()
+        return redirect(url_for('foradmin'))
+    return render_template('category.html', form=form)
+
+
+@app.route('/quest', methods=['POST', 'GET'])
 @login_required
 def quest():
-    form_cat = CategoryForm()
     form = QuestionForm()
     if form.validate_on_submit():
-        category = Category(name=form_cat.name.data)
         question = Questionary(category=form.category.data, name=form.name.data)
-        db.session.add(category)
         db.session.add(question)
         db.session.commit()
         return redirect(url_for('foradmin'))
-    return render_template('quest.html', form_cat=form_cat, form=form)
-
-    return render_template('quest.html')
+    return render_template('quest.html', form=form)
 
 
 if __name__ == '__main__':
